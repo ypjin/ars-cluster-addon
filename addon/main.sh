@@ -1,6 +1,13 @@
-pod-sec-policy.sh
-tiller.sh (kube-system)
-metrics-server.sh (kube-system)
-cluster-autoscaler.sh (kube-system)
-efk.sh (kube-system)
-istio.sh (istio-system)
+#!/bin/bash
+
+./pod-sec-policy.sh
+# kube-system
+./tiller.sh 
+# kube-system
+./metrics-server.sh
+# kube-system
+cluster-autoscaler.sh spectest.jin.apirs.net 5 us-west-2 s3://yuping-k8s-kops-state
+# kube-system
+efk.sh us-west-2a
+# istio-system
+istio.sh spectest.jin.apirs.net yuping-k8s-kops-state
