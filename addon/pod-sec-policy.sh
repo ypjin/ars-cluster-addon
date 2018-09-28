@@ -14,9 +14,9 @@ kind: PodSecurityPolicy
 metadata:
   name: restricted
   annotations:
-    # seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default'
     # apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
-    # seccomp.security.alpha.kubernetes.io/defaultProfileName:  'docker/default'
+    seccomp.security.alpha.kubernetes.io/defaultProfileName:  'docker/default'
     # apparmor.security.beta.kubernetes.io/defaultProfileName:  'runtime/default'
 spec:
   privileged: false
@@ -33,6 +33,7 @@ spec:
     - 'projected'
     - 'secret'
     - 'downwardAPI'
+    - 'hostPath'
     # Assume that persistentVolumes set up by the cluster admin are safe to use.
     - 'persistentVolumeClaim'
   hostNetwork: false
