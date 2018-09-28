@@ -1,0 +1,299 @@
+apiVersion: kops/v1alpha2
+kind: Cluster
+metadata:
+  creationTimestamp: 2018-09-05T09:52:10Z
+  name: spectest.jin.apirs.net
+spec:
+  additionalPolicies:
+    master: |
+      [
+        {
+          "Effect": "Allow",
+          "Action": ["route53:ChangeResourceRecordSets"],
+          "Resource": ["arn:aws:route53:::hostedzone/*"]
+        },
+        {
+          "Effect": "Allow",
+          "Action": ["route53:ListHostedZones",
+                     "route53:ListResourceRecordSets"],
+          "Resource": ["*"]
+        }
+      ]
+  api:
+    loadBalancer:
+      type: Public
+  authorization:
+    rbac: {}
+  channel: stable
+  cloudLabels:
+    Project: dev.ars
+    axway:billing: infra__ars__kubernetes
+    axway:environment: dev
+  cloudProvider: aws
+  configBase: s3://yuping-k8s-kops-state/spectest.jin.apirs.net
+  etcdClusters:
+  - etcdMembers:
+    - instanceGroup: master-us-west-2a
+      name: a
+    - instanceGroup: master-us-west-2b
+      name: b
+    - instanceGroup: master-us-west-2c
+      name: c
+    name: main
+  - etcdMembers:
+    - instanceGroup: master-us-west-2a
+      name: a
+    - instanceGroup: master-us-west-2b
+      name: b
+    - instanceGroup: master-us-west-2c
+      name: c
+    name: events
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+  kubeAPIServer:
+    admissionControl:
+    - NamespaceLifecycle
+    - LimitRanger
+    - ServiceAccount
+    - PersistentVolumeLabel
+    - DefaultStorageClass
+    - DefaultTolerationSeconds
+    - MutatingAdmissionWebhook
+    - ValidatingAdmissionWebhook
+    - ResourceQuota
+    - NodeRestriction
+    - Priority
+    - PodTolerationRestriction
+    - PodNodeSelector
+    - PodSecurityPolicy
+  kubernetesApiAccess:
+  - 0.0.0.0/0
+  kubernetesVersion: 1.9.10
+  masterPublicName: api.spectest.jin.apirs.net
+  networkCIDR: 172.1.0.0/16
+  networking:
+    calico: {}
+  nonMasqueradeCIDR: 100.64.0.0/10
+  sshAccess:
+  - 0.0.0.0/0
+  subnets:
+  - cidr: 172.1.32.0/19
+    name: us-west-2a
+    type: Private
+    zone: us-west-2a
+  - cidr: 172.1.64.0/19
+    name: us-west-2b
+    type: Private
+    zone: us-west-2b
+  - cidr: 172.1.96.0/19
+    name: us-west-2c
+    type: Private
+    zone: us-west-2c
+  - cidr: 172.1.0.0/22
+    name: utility-us-west-2a
+    type: Utility
+    zone: us-west-2a
+  - cidr: 172.1.4.0/22
+    name: utility-us-west-2b
+    type: Utility
+    zone: us-west-2b
+  - cidr: 172.1.8.0/22
+    name: utility-us-west-2c
+    type: Utility
+    zone: us-west-2c
+  topology:
+    bastion:
+      bastionPublicName: bastion.spectest.jin.apirs.net
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:44Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: bastions
+spec:
+  image: ami-28e07e50
+  machineType: t2.micro
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: bastions
+  role: Bastion
+  subnets:
+  - utility-us-west-2a
+  - utility-us-west-2b
+  - utility-us-west-2c
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:43Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: master-us-west-2a
+spec:
+  image: ami-28e07e50
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-west-2a
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+  role: Master
+  subnets:
+  - us-west-2a
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:43Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: master-us-west-2b
+spec:
+  image: ami-28e07e50
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-west-2b
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+  role: Master
+  subnets:
+  - us-west-2b
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:44Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: master-us-west-2c
+spec:
+  image: ami-28e07e50
+  machineType: t2.medium
+  maxSize: 1
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-us-west-2c
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+  role: Master
+  subnets:
+  - us-west-2c
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:44Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: addon-service-nodes
+spec:
+  image: ami-28e07e50
+  machineType: t2.medium
+  maxSize: 3
+  minSize: 2
+  nodeLabels:
+    kops.k8s.io/instancegroup: addon-service-nodes
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+    addon-service: "true"
+  role: Node
+  subnets:
+  - us-west-2a
+  - us-west-2b
+  - us-west-2c
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:44Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: ars-system-nodes
+spec:
+  image: ami-28e07e50
+  machineType: t2.medium
+  maxSize: 3
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: ars-system-nodes
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+    ars-system: "true"
+  taints:
+  - ars-node-type=system:NoExecute
+  role: Node
+  subnets:
+  - us-west-2a
+  - us-west-2b
+  - us-west-2c
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:44Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: ars-mongo-nodes
+spec:
+  image: ami-28e07e50
+  machineType: t2.medium
+  maxSize: 3
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: ars-mongo-nodes
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+    ars-system: "true"
+    ars-mongo: "true"
+  taints:
+  - ars-node-type=system:NoExecute
+  role: Node
+  subnets:
+  - us-west-2a
+  - us-west-2b
+  - us-west-2c
+
+---
+
+apiVersion: kops/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: 2018-05-01T18:23:44Z
+  labels:
+    kops.k8s.io/cluster: spectest.jin.apirs.net
+  name: ars-tenant-nodes
+spec:
+  image: ami-28e07e50
+  machineType: t2.large
+  maxSize: 3
+  minSize: 1
+  nodeLabels:
+    kops.k8s.io/instancegroup: ars-tenant-nodes
+    beta.kubernetes.io/fluentd-ds-ready: "true"
+    ars-tenant: "true"
+  taints:
+  - ars-node-type=tenant:NoExecute
+  role: Node
+  subnets:
+  - us-west-2a
+  - us-west-2b
+  - us-west-2c
