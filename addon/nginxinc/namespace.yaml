@@ -1,4 +1,11 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: nginx-ingress 
+  name: ars-tenant-ingress 
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ars-system-ingress 

@@ -50,7 +50,10 @@ roleRef:
   name: psp-privileged
   apiGroup: rbac.authorization.k8s.io
 subjects:
-# Authorize all service accounts in namespace nginx-ingress:
+# Authorize all service accounts in namespace ars-tenant-ingress and ars-system-ingress:
 - kind: Group
   apiGroup: rbac.authorization.k8s.io
-  name: system:serviceaccounts:nginx-ingress
+  name: system:serviceaccounts:ars-tenant-ingress
+- kind: Group
+  apiGroup: rbac.authorization.k8s.io
+  name: system:serviceaccounts:ars-system-ingress

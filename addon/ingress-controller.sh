@@ -6,5 +6,14 @@ kubectl apply -f ./nginxinc/namespace.yaml
 
 kubectl apply -f ./nginxinc/psp.yaml
 
-helm install --name nginxinc --namespace nginx-ingress -f ./nginxinc/values.yaml ./nginxinc/helm-chart
+echo
+echo >>>
+echo install ingress controller for tenant services...
+echo
+helm install --name tenantinc --namespace ars-tenant-ingress -f ./nginxinc/values-tenant.yaml ./nginxinc/helm-chart
 
+echo
+echo >>>
+echo install ingress controller for ARS system services...
+echo
+helm install --name systeminc --namespace ars-system-ingress -f ./nginxinc/values-system.yaml ./nginxinc/helm-chart

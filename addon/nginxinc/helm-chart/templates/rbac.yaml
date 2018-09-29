@@ -2,7 +2,7 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: nginx-ingress
+  name: nginx-ingress-{{ .Release.Name }}
   labels:
     app: {{ .Values.controller.name | trunc 63 }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
@@ -69,7 +69,7 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
-  name: nginx-ingress
+  name: nginx-ingress-{{ .Release.Name }}
   labels:
     app: {{ .Values.controller.name | trunc 63 }}
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
@@ -81,6 +81,6 @@ subjects:
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: nginx-ingress
+  name: nginx-ingress-{{ .Release.Name }}
   apiGroup: rbac.authorization.k8s.io
 {{- end }}

@@ -1,0 +1,6 @@
+This chart was downloaded from https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart at commit d0a2e1de13064eaff47cbfb277fb7f62cef9669e (master).
+
+One customization was done:
+
+templates/rbac.yaml was updated to append "-{{ .Release.Name }}" to ClusterRole and ClusterRoleBinding names. This is to allow installing multiple instances of the chart in a cluster. 
+
