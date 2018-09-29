@@ -136,10 +136,10 @@ spec:
             - --stderrthreshold=info
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=false
-            - --nodes=1:5:ars-tenant-nodes.spectest.jin.apirs.net
+            - --nodes=1:10:k8s-worker-asg-1
           env:
             - name: AWS_REGION
-              value: us-west-2
+              value: us-east-1
           volumeMounts:
             - name: ssl-certs
               mountPath: /etc/ssl/certs/ca-certificates.crt
@@ -148,4 +148,4 @@ spec:
       volumes:
         - name: ssl-certs
           hostPath:
-            path: /etc/ssl/certs/ca-certificates.crt
+            path: "/etc/ssl/certs/ca-certificates.crt"

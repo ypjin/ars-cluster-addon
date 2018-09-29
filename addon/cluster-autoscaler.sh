@@ -88,7 +88,7 @@ EOF
  sed -i -e "s@cloud-provider=aws@cloud-provider=${CLOUD_PROVIDER}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  sed -i -e "s@nodes=1:10:k8s-worker-asg-1@nodes=${MIN_NODES}:${MAX_NODES}:${ASG_NAME}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  sed -i -e "s@mountPath: /etc/ssl/certs/ca-certificates.crt@mountPath: ${SSL_CERT_PATH}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
- sed -i -e "s@path: /etc/ssl/certs/ca-certificates.crt@path: ${SSL_CERT_PATH}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
+ sed -i -e "s@path: \"/etc/ssl/certs/ca-certificates.crt\"@path: \"${SSL_CERT_PATH}\"@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  
  kubectl apply -f $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml || return 1
 
