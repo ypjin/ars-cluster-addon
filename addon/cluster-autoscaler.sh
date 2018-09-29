@@ -10,21 +10,22 @@ echo_and_exit() {
   exit 1
 }
 
-# ./cluster-autoscaler.sh spectest.jin.apirs.net 5 us-west-2 s3://yuping-k8s-kops-state
+# ./cluster-autoscaler.sh spectest.jin.apirs.net 5 us-west-2
 usage() {
    cat <<EOF
-Usage: $0  <CLUSTER_NAME> <MAX_NODES> <AWS_REGION> <S3_BUCKET_NAME>
+Usage: $0  <CLUSTER_NAME> <MAX_NODES> <AWS_REGION>
 EOF
 }
 
 cluster_autoscaler_init(){
   
-  if [[ "$#" -ne "4" ]]; then
+  if [[ "$#" -ne "3" ]]; then
     usage
     return 1
   fi
 
-  clusterautoscalerdir=$(mktemp -d) || return 1
+  # clusterautoscalerdir=$(mktemp -d) || return 1
+  clusterautoscalerdir=./autoscaler
 
   echo "clusterautoscalerdir="$clusterautoscalerdir
   
@@ -42,40 +43,6 @@ cluster_autoscaler_init(){
   local SSL_CERT_PATH="/etc/ssl/certs/ca-bundle.crt" 
 
   echo " Set up Autoscaling"
-  echo " Update the minSize and maxSize attributes for the kops instancegroup."
-
-#################################################################################################################
-# apiVersion: kops/v1alpha2
-# kind: InstanceGroup
-# metadata:
-#  creationTimestamp: 2018-08-27T17:20:19Z
-#  labels:
-#    kops.k8s.io/cluster: dev.arscluster.k8s.local
-#  name: nodes
-# spec:
-#  image: ami-de8fb135
-#  machineType: m4.large
-#  maxSize: 5
-#  minSize: 1
-
-
-#################################################################################################################
- 
- kops get ig $INSTANCE_GROUP_NAME --name ${CLUSTER_NAME} --state ${KOPS_STATE_STORE} -o yaml >> $clusterautoscalerdir/ig.yaml || return 1
-
- sed -i -e "s@minSize: [0-9]*@minSize: ${MIN_NODES}@" $clusterautoscalerdir/ig.yaml
- sed -i -e "s@maxSize: [0-9]*@maxSize: ${MAX_NODES}@" $clusterautoscalerdir/ig.yaml
-
- kops replace -f $clusterautoscalerdir/ig.yaml --name ${CLUSTER_NAME} --state ${KOPS_STATE_STORE} || return 1
- kops update cluster --yes  --name ${CLUSTER_NAME} --state ${KOPS_STATE_STORE} || return 1
-
-# à decaler plus bas possiblement
- kops rolling-update cluster  --yes --name ${CLUSTER_NAME} --state ${KOPS_STATE_STORE} || return 1
-
-#################################################################################################################
-
-#  echo "   Running kops update cluster --yes"
-#  kops update cluster --yes --state ${KOPS_STATE_STORE} --name ${CLUSTER_NAME}
  
  echo " Creating IAM policy to allow aws-cluster-autoscaler access to AWS autoscaling groups…"
 cat > asg-policy.json << EOF
@@ -115,12 +82,13 @@ EOF
 
  rm -f ./asg-policy.json
 
- wget -O $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-one-asg.yaml
+ # wget -O $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-one-asg.yaml
  
  sed -i -e "s@value: us-east-1@value: ${AWS_REGION}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  sed -i -e "s@cloud-provider=aws@cloud-provider=${CLOUD_PROVIDER}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  sed -i -e "s@nodes=1:10:k8s-worker-asg-1@nodes=${MIN_NODES}:${MAX_NODES}:${ASG_NAME}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  sed -i -e "s@mountPath: /etc/ssl/certs/ca-certificates.crt@mountPath: ${SSL_CERT_PATH}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
+ sed -i -e "s@path: /etc/ssl/certs/ca-certificates.crt@path: ${SSL_CERT_PATH}@g" $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml
  
  kubectl apply -f $clusterautoscalerdir/cluster-autoscaler-one-asg.yaml || return 1
 
@@ -136,7 +104,7 @@ EOF
 
  [[ $SECONDS -gt 40 ]] && return 1 || echo "cluster-autoscaler pods are ready"
  echo "Done"
- rm -fr $clusterautoscalerdir
+ # rm -fr $clusterautoscalerdir
 }
 
 cluster_autoscaler_init $1 $2 $3 $4|| echo_and_exit "cluster-autoscaler init failed"

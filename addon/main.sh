@@ -6,7 +6,7 @@
 # kube-system
 ./metrics-server.sh
 # kube-system
-cluster-autoscaler.sh spectest.jin.apirs.net 5 us-west-2 s3://yuping-k8s-kops-state
+cluster-autoscaler.sh spectest.jin.apirs.net 5 us-west-2
 # kube-system
 efk.sh us-west-2a
 # istio-system
