@@ -100,16 +100,7 @@ spec:
       tolerations:
       - effect: NoExecute
         key: ars-node-type
-        operator: Equal
-        value: system
-      - effect: NoExecute
-        key: ars-node-type
-        operator: Equal
-        value: mongo
-      - effect: NoExecute
-        key: ars-node-type
-        operator: Equal
-        value: tenant
+        operator: Exists
       terminationGracePeriodSeconds: 30
       volumes:
       - name: varlog
