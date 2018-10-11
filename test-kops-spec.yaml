@@ -237,6 +237,7 @@ spec:
     kops.k8s.io/instancegroup: ars-system-nodes
     beta.kubernetes.io/fluentd-ds-ready: "true"
     ars-system: "true"
+    ars-service: "true"
   taints:
   - ars-node-type=system:NoExecute
   role: Node

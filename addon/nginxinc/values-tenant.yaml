@@ -3,3 +3,6 @@ controller:
   healthStatus: true
   ingressClass: nginx
   useIngressClassOnly: false
+  nginxStatus: 
+    enable: true
+    port: 8080 
